@@ -29,7 +29,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(top_users, many=True)
         return Response(serializer.data)
 
-
+# potato potato
 class TeamViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing teams.
