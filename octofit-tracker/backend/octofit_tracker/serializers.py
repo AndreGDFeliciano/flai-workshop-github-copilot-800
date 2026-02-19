@@ -3,17 +3,35 @@ from .models import User, Team, Activity, Workout, Leaderboard
 
 
 class UserSerializer(serializers.ModelSerializer):
+    team_name = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = ['_id', 'name', 'alias', 'email', 'team_id', 'created_at', 'total_points', 'fitness_level']
+        fields = ['_id', 'name', 'alias', 'email', 'team_id', 'team_name', 'created_at', 'total_points', 'fitness_level']
         read_only_fields = ['_id', 'created_at']
+    
+    def get_team_name(self, obj):
+        """Get the team name for this user"""
+        if obj.team_id:
+            try:
+                team = Team.objects.get(_id=obj.team_id)
+                return team.name
+            except Team.DoesNotExist:
+                return None
+        return None
 
 
 class TeamSerializer(serializers.ModelSerializer):
+    member_count = serializers.SerializerMethodField()
+    
     class Meta:
         model = Team
-        fields = ['_id', 'name', 'description', 'created_at', 'members']
+        fields = ['_id', 'name', 'description', 'created_at', 'members', 'member_count']
         read_only_fields = ['created_at']
+    
+    def get_member_count(self, obj):
+        """Get actual count of users in this team"""
+        return User.objects.filter(team_id=obj._id).count()
 
 
 class ActivitySerializer(serializers.ModelSerializer):
